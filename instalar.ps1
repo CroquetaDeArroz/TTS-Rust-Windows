@@ -48,8 +48,7 @@ if (Get-Command cargo -ErrorAction SilentlyContinue) {
     & $rustupPath -y --default-toolchain stable | Out-Null
     
     # RECARGAR PATH (Lo nuevo va aquí exactamente)
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-    
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")    
     Ok "Rust instalado: $(cargo --version)"
 }
 Write-Host ""
