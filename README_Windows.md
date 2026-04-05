@@ -4,7 +4,6 @@ A **Text-to-Speech (TTS) bot for Twitch**, written in **Rust**, with a terminal-
 
 Reads chat messages aloud through your system audio and lets the streamer control the volume via chat commands.
 
-![preview](preview.png)
 
 ---
 
