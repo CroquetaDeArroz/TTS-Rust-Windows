@@ -48,7 +48,7 @@ if (Get-Command cargo -ErrorAction SilentlyContinue) {
     & $rustupPath -y --default-toolchain stable | Out-Null
     # Recargar PATH
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" +
-                [System.Environment]::GetEnvironmentVariable("Path","User")
+                Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
     Ok "Rust instalado: $(cargo --version)"
 }
 Write-Host ""
