@@ -1,15 +1,6 @@
-# ╔══════════════════════════════════════════════════════════════╗
-# ║           Twitch TTS Bot — Instalador Windows               ║
-# ║                  PowerShell 5.1 o superior                  ║
-# ╚══════════════════════════════════════════════════════════════╝
-#
-# Ejecutar desde PowerShell como Administrador:
-#   Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
-#   .\instalar.ps1
 
 $ErrorActionPreference = "Stop"
 
-# ── Colores ───────────────────────────────────────────────────────────────────
 function Ok($msg)   { Write-Host "  [OK] $msg"   -ForegroundColor Green  }
 function Info($msg) { Write-Host "   >>  $msg"   -ForegroundColor Cyan   }
 function Warn($msg) { Write-Host "  [!]  $msg"   -ForegroundColor Yellow }
@@ -33,7 +24,6 @@ $PiperDir    = Join-Path $ProyectoDir "files\piper"
 Info "Directorio del proyecto: $ProyectoDir"
 Write-Host ""
 
-# ── Paso 1: Rust ──────────────────────────────────────────────────────────────
 Write-Host "── Paso 1/5  Rust ──" -ForegroundColor White
 
 if (Get-Command cargo -ErrorAction SilentlyContinue) {
@@ -53,7 +43,6 @@ if (Get-Command cargo -ErrorAction SilentlyContinue) {
 }
 Write-Host ""
 
-# ── Paso 2: Python + gTTS + Coqui TTS ────────────────────────────────────────
 Write-Host "── Paso 2/5  Python y motores TTS ──" -ForegroundColor White
 
 if (Get-Command python -ErrorAction SilentlyContinue) {
@@ -69,7 +58,6 @@ pip install gtts TTS --quiet
 Ok "gTTS y Coqui TTS instalados"
 Write-Host ""
 
-# ── Paso 3: Piper TTS ─────────────────────────────────────────────────────────
 Write-Host "── Paso 3/5  Piper TTS ──" -ForegroundColor White
 
 New-Item -ItemType Directory -Force -Path $PiperDir | Out-Null
@@ -97,7 +85,6 @@ if (Test-Path $PiperExe) {
 }
 Write-Host ""
 
-# ── Paso 4: Modelos de voz ────────────────────────────────────────────────────
 Write-Host "── Paso 4/5  Modelos de voz ──" -ForegroundColor White
 
 $ModeloEs   = Join-Path $PiperDir "es_ES-sharvard-medium.onnx"
@@ -126,7 +113,6 @@ if ((Test-Path $ModeloEn) -and (Test-Path $ModeloEnJ)) {
 }
 Write-Host ""
 
-# ── Paso 5: Compilar el bot ───────────────────────────────────────────────────
 Write-Host "── Paso 5/5  Compilando el bot ──" -ForegroundColor White
 
 Info "Compilando para Windows (puede tardar unos minutos la primera vez)..."
@@ -150,7 +136,6 @@ if ((Test-Path $BotExe) -and (Test-Path $ConfigExe)) {
 }
 Write-Host ""
 
-# ── Variable de entorno PIPER_DIR ─────────────────────────────────────────────
 Info "Configurando variable de entorno PIPER_DIR..."
 [System.Environment]::SetEnvironmentVariable(
     "PIPER_DIR", $PiperDir,
@@ -159,7 +144,6 @@ Info "Configurando variable de entorno PIPER_DIR..."
 Ok "PIPER_DIR=$PiperDir"
 Write-Host ""
 
-# ── Resumen final ─────────────────────────────────────────────────────────────
 Write-Host "══════════════════════════════════════════" -ForegroundColor Magenta
 Write-Host "  [OK]  Instalación completada"            -ForegroundColor Green
 Write-Host "══════════════════════════════════════════" -ForegroundColor Magenta
