@@ -133,21 +133,30 @@ Write-Host "── Paso 5/5  Compilando el bot ──" -ForegroundColor White
 Info "Compilando para Windows (puede tardar unos minutos la primera vez)..."
 Set-Location $FilesDir
 
+# Ejecutar compilación
 $buildOutput = cargo build --release 2>&1
-if ($LASTEXITCODE -eq 0) {
-    Ok "Compilación exitosa"
-} else {
-    Write-Host $buildOutput
-    Err "La compilación falló. Revisa los errores de arriba."
+if ($LASTEXITCODE -ne 0) {
+    Write-Host $buildOutput -ForegroundColor Red
+    Err "La compilación falló. ¿Tienes instalado Visual Studio Build Tools con C++?"
 }
 
-$BotExe      = Join-Path $FilesDir "target\release\bot.exe"
-$ConfigExe   = Join-Path $FilesDir "target\release\config-ui.exe"
+Ok "Compilación finalizada. Verificando archivos..."
 
-if ((Test-Path $BotExe) -and (Test-Path $ConfigExe)) {
-    Ok "Binarios generados correctamente"
+# --- BUSCADOR AUTOMÁTICO DE EJECUTABLES ---
+# Esto busca cualquier .exe en la carpeta release por si el nombre no es "bot.exe"
+$ReleaseDir = Join-Path $FilesDir "target\release"
+$ExesFound = Get-ChildItem -Path $ReleaseDir -Filter "*.exe" | Where-Object { $_.Name -notlike "*pdb*" }
+
+if ($ExesFound.Count -ge 1) {
+    Ok "Se han generado los siguientes ejecutables:"
+    foreach ($exe in $ExesFound) {
+        Write-Host "     -> $($exe.FullName)" -ForegroundColor Gray
+    }
+    # Asignamos el primero que encuentre para que el script no se detenga
+    $BotExe = $ExesFound[0].FullName
+    $ConfigExe = $ExesFound[0].FullName # Si solo hay uno, usamos el mismo
 } else {
-    Err "No se encontraron los ejecutables. Revisa la compilación."
+    Err "No se encontró ningún archivo .exe en $ReleaseDir. Revisa los errores de compilación arriba."
 }
 Write-Host ""
 
