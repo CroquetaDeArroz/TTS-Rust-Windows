@@ -46,8 +46,9 @@ if (Get-Command cargo -ErrorAction SilentlyContinue) {
     Invoke-WebRequest -Uri $rustupUrl -OutFile $rustupPath
     Info "Instalando Rust (puede tardar unos minutos)..."
     & $rustupPath -y --default-toolchain stable | Out-Null
-    # Recargar PATH
-   $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    
+    # RECARGAR PATH (Lo nuevo va aquí exactamente)
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
     
     Ok "Rust instalado: $(cargo --version)"
 }
