@@ -46,9 +46,9 @@ if (Get-Command cargo -ErrorAction SilentlyContinue) {
     Invoke-WebRequest -Uri $rustupUrl -OutFile $rustupPath
     Info "Instalando Rust (puede tardar unos minutos)..."
     & $rustupPath -y --default-toolchain stable | Out-Null
-    
-    # RECARGAR PATH (Lo nuevo va aquí exactamente)
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")    
+    # Recargar PATH
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" +
+                [System.Environment]::GetEnvironmentVariable("Path","User")
     Ok "Rust instalado: $(cargo --version)"
 }
 Write-Host ""
@@ -69,50 +69,34 @@ pip install gtts TTS --quiet
 Ok "gTTS y Coqui TTS instalados"
 Write-Host ""
 
-# ── Paso 5: Compilar el bot ───────────────────────────────────────────────────
-Write-Host "── Paso 5/5  Compilando el bot ──" -ForegroundColor White
+# ── Paso 3: Piper TTS ─────────────────────────────────────────────────────────
+Write-Host "── Paso 3/5  Piper TTS ──" -ForegroundColor White
 
-Info "Compilando para Windows (puede tardar unos minutos la primera vez)..."
+New-Item -ItemType Directory -Force -Path $PiperDir | Out-Null
 
-# Forzar la ruta al directorio donde está el script
-$FilesDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location $FilesDir
+$PiperExe = Join-Path $PiperDir "piper.exe"
 
-# Verificar si existe Cargo.toml antes de compilar
-if (-not (Test-Path "Cargo.toml")) {
-    Err "No se encontró el archivo Cargo.toml en $FilesDir. Asegúrate de que el script esté en la carpeta raíz del proyecto."
-}
-
-# Ejecutar compilación
-cargo build --release
-if ($LASTEXITCODE -ne 0) {
-    Err "La compilación falló. Revisa los errores de Rust arriba (probablemente falten las Build Tools de C++)."
-}
-
-Ok "Compilación finalizada. Verificando archivos..."
-
-$ReleaseDir = Join-Path $FilesDir "target\release"
-
-# Si la carpeta no existe, la creamos virtualmente para que el comando no de error
-if (-not (Test-Path $ReleaseDir)) {
-    Err "La carpeta de salida $ReleaseDir no existe. La compilación no generó archivos."
-}
-
-$ExesFound = Get-ChildItem -Path $ReleaseDir -Filter "*.exe" | Where-Object { $_.Name -notlike "*pdb*" }
-
-if ($ExesFound) {
-    Ok "Ejecutables encontrados."
-    # Buscamos específicamente bot.exe y config-ui.exe por nombre
-    $BotExe = Get-Item -Path (Join-Path $ReleaseDir "bot.exe") -ErrorAction SilentlyContinue
-    $ConfigExe = Get-Item -Path (Join-Path $ReleaseDir "config-ui.exe") -ErrorAction SilentlyContinue
-    
-    # Si no tienen esos nombres exactos, usamos los que encuentre
-    if (-not $BotExe) { $BotExe = $ExesFound[0] }
-    if (-not $ConfigExe) { $ConfigExe = $ExesFound[-1] }
+if (Test-Path $PiperExe) {
+    Ok "Piper ya descargado"
 } else {
-    Err "No se encontró ningún archivo .exe en $ReleaseDir."
+    Info "Descargando Piper TTS para Windows..."
+    $PiperUrl = "https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_windows_amd64.zip"
+    $PiperZip = Join-Path $env:TEMP "piper_windows.zip"
+
+    Invoke-WebRequest -Uri $PiperUrl -OutFile $PiperZip
+    Info "Extrayendo..."
+    Expand-Archive -Path $PiperZip -DestinationPath $PiperDir -Force
+    Remove-Item $PiperZip
+
+    if (Test-Path $PiperExe) {
+        Ok "Piper extraído correctamente"
+    } else {
+        Warn "No se encontró piper.exe en $PiperDir"
+        Warn "Puede que la estructura del zip haya cambiado. Comprueba el contenido de $PiperDir"
+    }
 }
 Write-Host ""
+
 # ── Paso 4: Modelos de voz ────────────────────────────────────────────────────
 Write-Host "── Paso 4/5  Modelos de voz ──" -ForegroundColor White
 
@@ -148,30 +132,21 @@ Write-Host "── Paso 5/5  Compilando el bot ──" -ForegroundColor White
 Info "Compilando para Windows (puede tardar unos minutos la primera vez)..."
 Set-Location $FilesDir
 
-# Ejecutar compilación
 $buildOutput = cargo build --release 2>&1
-if ($LASTEXITCODE -ne 0) {
-    Write-Host $buildOutput -ForegroundColor Red
-    Err "La compilación falló. ¿Tienes instalado Visual Studio Build Tools con C++?"
+if ($LASTEXITCODE -eq 0) {
+    Ok "Compilación exitosa"
+} else {
+    Write-Host $buildOutput
+    Err "La compilación falló. Revisa los errores de arriba."
 }
 
-Ok "Compilación finalizada. Verificando archivos..."
+$BotExe      = Join-Path $FilesDir "target\release\bot.exe"
+$ConfigExe   = Join-Path $FilesDir "target\release\config-ui.exe"
 
-# --- BUSCADOR AUTOMÁTICO DE EJECUTABLES ---
-# Esto busca cualquier .exe en la carpeta release por si el nombre no es "bot.exe"
-$ReleaseDir = Join-Path $FilesDir "target\release"
-$ExesFound = Get-ChildItem -Path $ReleaseDir -Filter "*.exe" | Where-Object { $_.Name -notlike "*pdb*" }
-
-if ($ExesFound.Count -ge 1) {
-    Ok "Se han generado los siguientes ejecutables:"
-    foreach ($exe in $ExesFound) {
-        Write-Host "     -> $($exe.FullName)" -ForegroundColor Gray
-    }
-    # Asignamos el primero que encuentre para que el script no se detenga
-    $BotExe = $ExesFound[0].FullName
-    $ConfigExe = $ExesFound[0].FullName # Si solo hay uno, usamos el mismo
+if ((Test-Path $BotExe) -and (Test-Path $ConfigExe)) {
+    Ok "Binarios generados correctamente"
 } else {
-    Err "No se encontró ningún archivo .exe en $ReleaseDir. Revisa los errores de compilación arriba."
+    Err "No se encontraron los ejecutables. Revisa la compilación."
 }
 Write-Host ""
 
