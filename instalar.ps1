@@ -1,4 +1,3 @@
-
 $ErrorActionPreference = "Stop"
 
 function Ok($msg)   { Write-Host "  [OK] $msg"   -ForegroundColor Green  }
@@ -7,14 +6,14 @@ function Warn($msg) { Write-Host "  [!]  $msg"   -ForegroundColor Yellow }
 function Err($msg)  { Write-Host "  [X]  $msg"   -ForegroundColor Red; exit 1 }
 
 Write-Host ""
-Write-Host "  ████████╗████████╗███████╗    ██████╗  ██████╗ ████████╗" -ForegroundColor Magenta
-Write-Host "     ██╔══╝╚══██╔══╝██╔════╝    ██╔══██╗██╔═══██╗╚══██╔══╝" -ForegroundColor Magenta
-Write-Host "     ██║      ██║   ███████╗    ██████╔╝██║   ██║   ██║   " -ForegroundColor Magenta
-Write-Host "     ██║      ██║   ╚════██║    ██╔══██╗██║   ██║   ██║   " -ForegroundColor Magenta
-Write-Host "     ██║      ██║   ███████║    ██████╔╝╚██████╔╝   ██║   " -ForegroundColor Magenta
-Write-Host "     ╚═╝      ╚═╝   ╚══════╝    ╚═════╝  ╚═════╝    ╚═╝   " -ForegroundColor Magenta
+Write-Host "         " -ForegroundColor Magenta
+Write-Host "         " -ForegroundColor Magenta
+Write-Host "                           " -ForegroundColor Magenta
+Write-Host "                           " -ForegroundColor Magenta
+Write-Host "                        " -ForegroundColor Magenta
+Write-Host "                           " -ForegroundColor Magenta
 Write-Host ""
-Write-Host "  Twitch TTS Bot — Instalador Windows v1.0" -ForegroundColor Magenta
+Write-Host "  Twitch TTS Bot  Instalador Windows v1.0" -ForegroundColor Magenta
 Write-Host ""
 
 $ProyectoDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -24,7 +23,7 @@ $PiperDir    = Join-Path $ProyectoDir "files\piper"
 Info "Directorio del proyecto: $ProyectoDir"
 Write-Host ""
 
-Write-Host "── Paso 1/5  Rust ──" -ForegroundColor White
+Write-Host " Paso 1/5  Rust " -ForegroundColor White
 
 if (Get-Command cargo -ErrorAction SilentlyContinue) {
     $ver = cargo --version
@@ -36,14 +35,13 @@ if (Get-Command cargo -ErrorAction SilentlyContinue) {
     Invoke-WebRequest -Uri $rustupUrl -OutFile $rustupPath
     Info "Instalando Rust (puede tardar unos minutos)..."
     & $rustupPath -y --default-toolchain stable | Out-Null
-    # Recargar PATH
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" +
                 [System.Environment]::GetEnvironmentVariable("Path","User")
     Ok "Rust instalado: $(cargo --version)"
 }
 Write-Host ""
 
-Write-Host "── Paso 2/5  Python y motores TTS ──" -ForegroundColor White
+Write-Host " Paso 2/5  Python y motores TTS " -ForegroundColor White
 
 if (Get-Command python -ErrorAction SilentlyContinue) {
     Ok "Python encontrado: $(python --version)"
@@ -58,7 +56,7 @@ pip install gtts TTS --quiet
 Ok "gTTS y Coqui TTS instalados"
 Write-Host ""
 
-Write-Host "── Paso 3/5  Piper TTS ──" -ForegroundColor White
+Write-Host " Paso 3/5  Piper TTS " -ForegroundColor White
 
 New-Item -ItemType Directory -Force -Path $PiperDir | Out-Null
 
@@ -85,7 +83,7 @@ if (Test-Path $PiperExe) {
 }
 Write-Host ""
 
-Write-Host "── Paso 4/5  Modelos de voz ──" -ForegroundColor White
+Write-Host " Paso 4/5  Modelos de voz " -ForegroundColor White
 
 $ModeloEs   = Join-Path $PiperDir "es_ES-sharvard-medium.onnx"
 $ModeloEsJ  = Join-Path $PiperDir "es_ES-sharvard-medium.onnx.json"
@@ -113,7 +111,7 @@ if ((Test-Path $ModeloEn) -and (Test-Path $ModeloEnJ)) {
 }
 Write-Host ""
 
-Write-Host "── Paso 5/5  Compilando el bot ──" -ForegroundColor White
+Write-Host " Paso 5/5  Compilando el bot " -ForegroundColor White
 
 Info "Compilando para Windows (puede tardar unos minutos la primera vez)..."
 Set-Location $FilesDir
@@ -144,9 +142,9 @@ Info "Configurando variable de entorno PIPER_DIR..."
 Ok "PIPER_DIR=$PiperDir"
 Write-Host ""
 
-Write-Host "══════════════════════════════════════════" -ForegroundColor Magenta
+Write-Host "" -ForegroundColor Magenta
 Write-Host "  [OK]  Instalación completada"            -ForegroundColor Green
-Write-Host "══════════════════════════════════════════" -ForegroundColor Magenta
+Write-Host "" -ForegroundColor Magenta
 Write-Host ""
 Write-Host "  Pasos siguientes:" -ForegroundColor White
 Write-Host ""
