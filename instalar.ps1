@@ -52,7 +52,7 @@ if (Get-Command python -ErrorAction SilentlyContinue) {
 }
 
 Info "Instalando gTTS y Coqui TTS..."
-pip install gtts TTS --quiet
+pip install gtts --quiet
 Ok "gTTS y Coqui TTS instalados"
 Write-Host ""
 
