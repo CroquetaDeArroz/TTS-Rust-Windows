@@ -70,34 +70,50 @@ pip install gtts TTS --quiet
 Ok "gTTS y Coqui TTS instalados"
 Write-Host ""
 
-# ── Paso 3: Piper TTS ─────────────────────────────────────────────────────────
-Write-Host "── Paso 3/5  Piper TTS ──" -ForegroundColor White
+# ── Paso 5: Compilar el bot ───────────────────────────────────────────────────
+Write-Host "── Paso 5/5  Compilando el bot ──" -ForegroundColor White
 
-New-Item -ItemType Directory -Force -Path $PiperDir | Out-Null
+Info "Compilando para Windows (puede tardar unos minutos la primera vez)..."
 
-$PiperExe = Join-Path $PiperDir "piper.exe"
+# Forzar la ruta al directorio donde está el script
+$FilesDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+Set-Location $FilesDir
 
-if (Test-Path $PiperExe) {
-    Ok "Piper ya descargado"
+# Verificar si existe Cargo.toml antes de compilar
+if (-not (Test-Path "Cargo.toml")) {
+    Err "No se encontró el archivo Cargo.toml en $FilesDir. Asegúrate de que el script esté en la carpeta raíz del proyecto."
+}
+
+# Ejecutar compilación
+cargo build --release
+if ($LASTEXITCODE -ne 0) {
+    Err "La compilación falló. Revisa los errores de Rust arriba (probablemente falten las Build Tools de C++)."
+}
+
+Ok "Compilación finalizada. Verificando archivos..."
+
+$ReleaseDir = Join-Path $FilesDir "target\release"
+
+# Si la carpeta no existe, la creamos virtualmente para que el comando no de error
+if (-not (Test-Path $ReleaseDir)) {
+    Err "La carpeta de salida $ReleaseDir no existe. La compilación no generó archivos."
+}
+
+$ExesFound = Get-ChildItem -Path $ReleaseDir -Filter "*.exe" | Where-Object { $_.Name -notlike "*pdb*" }
+
+if ($ExesFound) {
+    Ok "Ejecutables encontrados."
+    # Buscamos específicamente bot.exe y config-ui.exe por nombre
+    $BotExe = Get-Item -Path (Join-Path $ReleaseDir "bot.exe") -ErrorAction SilentlyContinue
+    $ConfigExe = Get-Item -Path (Join-Path $ReleaseDir "config-ui.exe") -ErrorAction SilentlyContinue
+    
+    # Si no tienen esos nombres exactos, usamos los que encuentre
+    if (-not $BotExe) { $BotExe = $ExesFound[0] }
+    if (-not $ConfigExe) { $ConfigExe = $ExesFound[-1] }
 } else {
-    Info "Descargando Piper TTS para Windows..."
-    $PiperUrl = "https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_windows_amd64.zip"
-    $PiperZip = Join-Path $env:TEMP "piper_windows.zip"
-
-    Invoke-WebRequest -Uri $PiperUrl -OutFile $PiperZip
-    Info "Extrayendo..."
-    Expand-Archive -Path $PiperZip -DestinationPath $PiperDir -Force
-    Remove-Item $PiperZip
-
-    if (Test-Path $PiperExe) {
-        Ok "Piper extraído correctamente"
-    } else {
-        Warn "No se encontró piper.exe en $PiperDir"
-        Warn "Puede que la estructura del zip haya cambiado. Comprueba el contenido de $PiperDir"
-    }
+    Err "No se encontró ningún archivo .exe en $ReleaseDir."
 }
 Write-Host ""
-
 # ── Paso 4: Modelos de voz ────────────────────────────────────────────────────
 Write-Host "── Paso 4/5  Modelos de voz ──" -ForegroundColor White
 
