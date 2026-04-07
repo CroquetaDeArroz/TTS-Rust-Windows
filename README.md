@@ -4,7 +4,6 @@ A **Text-to-Speech (TTS) bot for Twitch**, written in **Rust**, with a terminal-
 
 Reads chat messages aloud through your system audio and lets the streamer control the volume via chat commands.
 
-![preview](preview.png)
 
 ---
 
@@ -50,7 +49,7 @@ Open **PowerShell** and run:
 
 ```powershell
 git clone https://github.com/CroquetaDeArroz/Bot-TTS-Rust.git
-cd Bot-TTS-Rust
+cd TTS-Rust-Windows
 ```
 
 > If you don't have Git, download it from [git-scm.com](https://git-scm.com/download/win) or just download the repo as a ZIP from GitHub.
