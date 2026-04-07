@@ -1,12 +1,12 @@
 $ErrorActionPreference = "Stop"
 
-function Ok($msg)   { Write-Host "  [OK] $msg"   -ForegroundColor Green  }
-function Info($msg) { Write-Host "   >>  $msg"   -ForegroundColor Cyan   }
-function Warn($msg) { Write-Host "  [!]  $msg"   -ForegroundColor Yellow }
-function Err($msg)  { Write-Host "  [X]  $msg"   -ForegroundColor Red; exit 1 }
+function Ok($msg)   { Write-Host "  [OK] $msg" -ForegroundColor Green  }
+function Info($msg) { Write-Host "   >>  $msg" -ForegroundColor Cyan   }
+function Warn($msg) { Write-Host "  [!]  $msg" -ForegroundColor Yellow }
+function Err($msg)  { Write-Host "  [X]  $msg" -ForegroundColor Red; exit 1 }
 
 Write-Host ""
-Write-Host "  Twitch TTS Bot — Instalador completo (Piper + gTTS)" -ForegroundColor Magenta
+Write-Host "  Twitch TTS Bot - Instalador completo (Piper + gTTS)" -ForegroundColor Magenta
 Write-Host ""
 
 $ProyectoDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -28,7 +28,7 @@ function Download($url, $dest) {
     $ProgressPreference = "Continue"
 }
 
-Write-Host "── Paso 1/5  Python ──" -ForegroundColor White
+Write-Host "-- Paso 1/5  Python --" -ForegroundColor White
 
 Reload-Path
 
@@ -57,7 +57,7 @@ if (Get-Command python -ErrorAction SilentlyContinue) {
 }
 Write-Host ""
 
-Write-Host "── Paso 2/5  Rust ──" -ForegroundColor White
+Write-Host "-- Paso 2/5  Rust --" -ForegroundColor White
 
 Reload-Path
 
@@ -91,7 +91,7 @@ if (Get-Command cargo -ErrorAction SilentlyContinue) {
 }
 Write-Host ""
 
-Write-Host "── Paso 3/5  gTTS (fallback online) ──" -ForegroundColor White
+Write-Host "-- Paso 3/5  gTTS (fallback online) --" -ForegroundColor White
 
 Info "Actualizando pip e instalando gTTS..."
 python -m pip install --upgrade pip --quiet
@@ -99,7 +99,7 @@ python -m pip install gtts --quiet
 Ok "gTTS instalado"
 Write-Host ""
 
-Write-Host "── Paso 4/5  Piper TTS y modelos de voz ──" -ForegroundColor White
+Write-Host "-- Paso 4/5  Piper TTS y modelos de voz --" -ForegroundColor White
 
 New-Item -ItemType Directory -Force -Path $PiperDir | Out-Null
 $PiperExe = Join-Path $PiperDir "piper.exe"
@@ -124,7 +124,7 @@ if (Test-Path $PiperExe) {
     }
 
     if (Test-Path $PiperExe) { Ok "Piper extraido correctamente" }
-    else { Warn "piper.exe no encontrado en $PiperDir — revisa el contenido manualmente." }
+    else { Warn "piper.exe no encontrado en $PiperDir - revisa el contenido manualmente." }
 }
 
 $ModeloEs  = Join-Path $PiperDir "es_ES-sharvard-medium.onnx"
@@ -153,7 +153,7 @@ if ((Test-Path $ModeloEn) -and (Test-Path $ModeloEnJ)) {
 }
 Write-Host ""
 
-Write-Host "── Paso 5/5  Compilando el bot ──" -ForegroundColor White
+Write-Host "-- Paso 5/5  Compilando el bot --" -ForegroundColor White
 
 Info "Compilando para Windows (puede tardar varios minutos la primera vez)..."
 Set-Location $FilesDir
@@ -181,14 +181,14 @@ Info "Configurando variable de entorno PIPER_DIR..."
 Ok "PIPER_DIR=$PiperDir"
 Write-Host ""
 
-Write-Host "══════════════════════════════════════════════════" -ForegroundColor Magenta
-Write-Host "  [OK]  Instalacion completada"                    -ForegroundColor Green
-Write-Host "══════════════════════════════════════════════════" -ForegroundColor Magenta
+Write-Host "==================================================" -ForegroundColor Magenta
+Write-Host "  [OK]  Instalacion completada"                     -ForegroundColor Green
+Write-Host "==================================================" -ForegroundColor Magenta
 Write-Host ""
 Write-Host "  Motores disponibles:" -ForegroundColor White
-Write-Host "    piper  — offline, recomendado (ya configurado)" -ForegroundColor Green
-Write-Host "    gtts   — fallback online (requiere internet)"   -ForegroundColor Yellow
-Write-Host "    coqui  — NO instalado en esta version"         -ForegroundColor DarkGray
+Write-Host "    piper  - offline, recomendado (ya configurado)" -ForegroundColor Green
+Write-Host "    gtts   - fallback online (requiere internet)"   -ForegroundColor Yellow
+Write-Host "    coqui  - NO instalado en esta version"          -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  Pasos siguientes:" -ForegroundColor White
 Write-Host ""
@@ -196,7 +196,7 @@ Write-Host "  1. Abre la configuracion:" -ForegroundColor Cyan
 Write-Host "     $ConfigExe" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "  2. Elige idioma, rellena tus datos de Twitch" -ForegroundColor Cyan
-Write-Host "     y selecciona 'piper' como motor TTS." -ForegroundColor Cyan
+Write-Host "     y selecciona piper como motor TTS." -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  3. Arranca el bot:" -ForegroundColor Cyan
 Write-Host "     $BotExe" -ForegroundColor Yellow
