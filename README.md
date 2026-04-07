@@ -48,7 +48,7 @@ Everything else — Python, Rust, Piper, and gTTS — is installed automatically
 Open **PowerShell** and run:
 
 ```powershell
-git clone https://github.com/CroquetaDeArroz/Bot-TTS-Rust.git
+git clone https://github.com/CroquetaDeArroz/TTS-Rust-Windows.git
 cd TTS-Rust-Windows
 ```
 
