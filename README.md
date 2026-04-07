@@ -65,7 +65,7 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 ### 3. Run the installer
 
 ```powershell
-.\instalar_sin_coqui.ps1
+.\install.ps1
 ```
 
 The script will automatically:
